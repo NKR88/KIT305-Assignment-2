@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.kit305.tutorial05.databinding.ActivityMainBinding
@@ -17,6 +18,14 @@ import com.google.firebase.ktx.Firebase
 const val MOVIE_INDEX = "Movie_Index"
 val items = mutableListOf<Movie>()
 const val FIREBASE_TAG = "FirebaseLogging"
+
+enum class Mode {
+    NORMAL,
+    EDIT,
+    DELETE
+}
+private var currentMode = Mode.NORMAL
+
 class MainActivity : AppCompatActivity()
 {
     private lateinit var ui : ActivityMainBinding
@@ -32,6 +41,35 @@ class MainActivity : AppCompatActivity()
 
         //vertical list
         ui.myList.layoutManager = LinearLayoutManager(this)
+
+
+        ui.btnMode.setOnClickListener { view ->
+
+            val popup = PopupMenu(this, view)
+            popup.menuInflater.inflate(R.menu.mode_menu, popup.menu)
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_normal -> {
+                        currentMode = Mode.NORMAL
+                        
+                    }
+                    R.id.menu_edit -> {
+                        currentMode = Mode.EDIT
+                   
+                    }
+                    R.id.menu_delete -> {
+                        currentMode = Mode.DELETE
+                
+                    }
+                }
+
+                (ui.myList.adapter as MovieAdapter).updateMode(currentMode)
+                true
+            }
+
+            popup.show()
+        }
 
         //get db connection
         val db = Firebase.firestore
@@ -84,7 +122,7 @@ class MainActivity : AppCompatActivity()
 
     inner class MovieHolder(var ui: MyListItemBinding) : RecyclerView.ViewHolder(ui.root) {}
 
-    inner class MovieAdapter(private val movies: MutableList<Movie>) : RecyclerView.Adapter<MovieHolder>()
+    inner class MovieAdapter(private val movies: MutableList<Movie>, private var mode: Mode = Mode.NORMAL) : RecyclerView.Adapter<MovieHolder>()
     {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity.MovieHolder {
             val ui = MyListItemBinding.inflate(layoutInflater, parent, false)   //inflate a new row from the my_list_item.xml
@@ -100,14 +138,47 @@ class MainActivity : AppCompatActivity()
             holder.ui.txtName.text = movie.title
             holder.ui.txtYear.text = movie.year.toString()
 
+//            holder.ui.root.setOnClickListener {
+//                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+//                i.putExtra(MOVIE_INDEX, position)
+//                startActivity(i)
+//            }
             holder.ui.root.setOnClickListener {
-                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                i.putExtra(MOVIE_INDEX, position)
-                startActivity(i)
+
+                when (mode) {
+                    Mode.NORMAL -> {
+                        val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+                        i.putExtra(MOVIE_INDEX, position)
+                        startActivity(i)
+                    }
+
+                    Mode.EDIT -> {
+                        val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+                        i.putExtra(MOVIE_INDEX, position)
+                        startActivity(i)
+                        // later you can make a proper edit screen
+                    }
+
+                    Mode.DELETE -> {
+                        val db = Firebase.firestore
+                        movie.id?.let {
+                            db.collection("movies")
+                                .document(it)
+                                .delete()
+                        }
+                    }
+                }
             }
 
             
         }
+
+        fun updateMode(newMode: Mode) {
+            mode = newMode
+            notifyDataSetChanged()
+        }
     }
 }
+
+private fun MainActivity.MovieAdapter.updateMode(currentMode: Mode) {}
 
