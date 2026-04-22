@@ -1,0 +1,41 @@
+
+House
+	Customer Name
+	Address
+	Price
+
+
+
+Room
+	Name
+	Windows
+	Floor Space
+	Price
+
+Windows
+	Name
+	Height
+	Width
+	Price
+
+Floor Space
+	Width
+	Depth
+	Price
+
+Product
+	Name
+	Description
+	Price
+	Image
+	Color
+	Min Height
+	Max Height
+
+
+
+
+
+		Carpet
+		Curtains
+		Blinds
