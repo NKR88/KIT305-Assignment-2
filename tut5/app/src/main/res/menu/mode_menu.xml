@@ -1,13 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_normal"
-        android:title="Normal Mode"/>
+        android:title="Normal Mode"
+        android:text="Normal Mode"/>
 
     <item
         android:id="@+id/menu_edit"
-        android:title="Edit Mode"/>
+        android:title="Edit Mode"
+        android:text="Edit Mode"/>
 
     <item
         android:id="@+id/menu_delete"
-        android:title="Delete Mode"/>
+        android:title="Delete Mode"
+        android:text="Delete Mode"/>
+
 </menu>

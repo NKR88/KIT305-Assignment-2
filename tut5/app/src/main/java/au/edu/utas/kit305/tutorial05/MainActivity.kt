@@ -19,13 +19,6 @@ const val MOVIE_INDEX = "Movie_Index"
 val items = mutableListOf<Movie>()
 const val FIREBASE_TAG = "FirebaseLogging"
 
-enum class Mode {
-    NORMAL,
-    EDIT,
-    DELETE
-}
-private var currentMode = Mode.NORMAL
-
 class MainActivity : AppCompatActivity()
 {
     private lateinit var ui : ActivityMainBinding
@@ -43,39 +36,11 @@ class MainActivity : AppCompatActivity()
         ui.myList.layoutManager = LinearLayoutManager(this)
 
 
-        ui.btnMode.setOnClickListener { view ->
-
-            val popup = PopupMenu(this, view)
-            popup.menuInflater.inflate(R.menu.mode_menu, popup.menu)
-
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.menu_normal -> {
-                        currentMode = Mode.NORMAL
-                        
-                    }
-                    R.id.menu_edit -> {
-                        currentMode = Mode.EDIT
-                   
-                    }
-                    R.id.menu_delete -> {
-                        currentMode = Mode.DELETE
-                
-                    }
-                }
-
-                (ui.myList.adapter as MovieAdapter).updateMode(currentMode)
-                true
-            }
-
-            popup.show()
-        }
-
         //get db connection
         val db = Firebase.firestore
         Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
-//        //add some data (comment this out after running the program once and confirming your data is there)
+        //add some data (comment this out after running the program once and confirming your data is there)
 //        val lotr = Movie(
 //            title = "Lord of the Rings: Fellowship of the Ring",
 //            year = 2001,
@@ -91,7 +56,33 @@ class MainActivity : AppCompatActivity()
 //            .addOnFailureListener {
 //                Log.e(FIREBASE_TAG, "Error writing document", it)
 //            }
+
+        ui.btnMenu.setOnClickListener { view ->
+
+            val popup = PopupMenu(this, view)
+            popup.menuInflater.inflate(R.menu.house_menu, popup.menu)
+
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_quote -> {
+
+                    }
+                    R.id.menu_add -> {
+
+                        val i = Intent(this, HouseAdd::class.java)
+                        startActivity(i)
+                    }
+
+                }
+                true
+            }
+            popup.show()
+        }
+
         //get all movies
+
+
+
         ui.lblMovieCount.text = "Loading..."
         moviesCollection
             .get()
@@ -122,7 +113,7 @@ class MainActivity : AppCompatActivity()
 
     inner class MovieHolder(var ui: MyListItemBinding) : RecyclerView.ViewHolder(ui.root) {}
 
-    inner class MovieAdapter(private val movies: MutableList<Movie>, private var mode: Mode = Mode.NORMAL) : RecyclerView.Adapter<MovieHolder>()
+    inner class MovieAdapter(private val movies: MutableList<Movie>) : RecyclerView.Adapter<MovieHolder>()
     {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity.MovieHolder {
             val ui = MyListItemBinding.inflate(layoutInflater, parent, false)   //inflate a new row from the my_list_item.xml
@@ -138,47 +129,12 @@ class MainActivity : AppCompatActivity()
             holder.ui.txtName.text = movie.title
             holder.ui.txtYear.text = movie.year.toString()
 
-//            holder.ui.root.setOnClickListener {
-//                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-//                i.putExtra(MOVIE_INDEX, position)
-//                startActivity(i)
-//            }
             holder.ui.root.setOnClickListener {
-
-                when (mode) {
-                    Mode.NORMAL -> {
-                        val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                        i.putExtra(MOVIE_INDEX, position)
-                        startActivity(i)
-                    }
-
-                    Mode.EDIT -> {
-                        val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                        i.putExtra(MOVIE_INDEX, position)
-                        startActivity(i)
-                        // later you can make a proper edit screen
-                    }
-
-                    Mode.DELETE -> {
-                        val db = Firebase.firestore
-                        movie.id?.let {
-                            db.collection("movies")
-                                .document(it)
-                                .delete()
-                        }
-                    }
-                }
+                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+                i.putExtra(MOVIE_INDEX, position)
+                startActivity(i)
             }
-
-            
-        }
-
-        fun updateMode(newMode: Mode) {
-            mode = newMode
-            notifyDataSetChanged()
         }
     }
 }
-
-private fun MainActivity.MovieAdapter.updateMode(currentMode: Mode) {}
 
