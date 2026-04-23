@@ -29,11 +29,11 @@ class  HouseAdd : AppCompatActivity() {
                 .addOnSuccessListener {
                     Log.d(FIREBASE_TAG, "Document created with id ${it.id}")
                     newHouse.id = it.id
+                    finish()
                 }
                 .addOnFailureListener {
                     Log.e(FIREBASE_TAG, "Error writing document", it)
                 }
-            finish()
         }
         ui.btnHouseCancel.setOnClickListener { view ->
             finish()

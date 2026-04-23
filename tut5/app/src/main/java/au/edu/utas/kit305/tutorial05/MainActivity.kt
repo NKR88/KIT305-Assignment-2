@@ -16,7 +16,7 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
 const val MOVIE_INDEX = "Movie_Index"
-val items = mutableListOf<Movie>()
+val items = mutableListOf<House>()
 const val FIREBASE_TAG = "FirebaseLogging"
 
 class MainActivity : AppCompatActivity()
@@ -30,32 +30,10 @@ class MainActivity : AppCompatActivity()
         setContentView(ui.root)
 
         ui.lblMovieCount.text = "${items.size} Movies"
-        ui.myList.adapter = MovieAdapter(movies = items)
+        ui.myList.adapter = MovieAdapter(houses = items)
 
         //vertical list
         ui.myList.layoutManager = LinearLayoutManager(this)
-
-
-        //get db connection
-        val db = Firebase.firestore
-        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
-
-        //add some data (comment this out after running the program once and confirming your data is there)
-//        val lotr = Movie(
-//            title = "Lord of the Rings: Fellowship of the Ring",
-//            year = 2001,
-//            duration = 9001F
-//        )
-        val moviesCollection = db.collection("movies")
-//        moviesCollection
-//            .add(lotr)
-//            .addOnSuccessListener {
-//                Log.d(FIREBASE_TAG, "Document created with id ${it.id}")
-//                lotr.id = it.id
-//            }
-//            .addOnFailureListener {
-//                Log.e(FIREBASE_TAG, "Error writing document", it)
-//            }
 
         ui.btnMenu.setOnClickListener { view ->
 
@@ -68,52 +46,26 @@ class MainActivity : AppCompatActivity()
 
                     }
                     R.id.menu_add -> {
-
                         val i = Intent(this, HouseAdd::class.java)
                         startActivity(i)
                     }
-
                 }
                 true
             }
             popup.show()
         }
-
         //get all movies
-
-
-
-        ui.lblMovieCount.text = "Loading..."
-        moviesCollection
-            .get()
-            .addOnSuccessListener { result ->
-                items.clear() //this line clears the list, and prevents a bug where items would be duplicated upon rotation of screen
-                Log.d(FIREBASE_TAG, "--- all movies ---")
-                for (document in result)
-                {
-                    //Log.d(FIREBASE_TAG, document.toString())
-                    val movie = document.toObject<Movie>()
-                    movie.id = document.id
-                    Log.d(FIREBASE_TAG, movie.toString())
-
-                    items.add(movie)
-                }
-                //(ui.myList.adapter as MovieAdapter).notifyDataSetChanged()
-                //you may choose to fix the warning that notifyDataSetChanged() is not specific enough using:
-                (ui.myList.adapter as MovieAdapter).notifyItemRangeInserted(0, items.size)
-                ui.lblMovieCount.text = " ${items.size} Movies"
-            }
-        
+        loadHouses()
     }
+
     override fun onResume() {
         super.onResume()
-
-        ui.myList.adapter?.notifyDataSetChanged() //without a more complicated set-up, we can't be more specific than "dataset changed"
+        loadHouses()
     }
 
     inner class MovieHolder(var ui: MyListItemBinding) : RecyclerView.ViewHolder(ui.root) {}
 
-    inner class MovieAdapter(private val movies: MutableList<Movie>) : RecyclerView.Adapter<MovieHolder>()
+    inner class MovieAdapter(private val houses: MutableList<House>) : RecyclerView.Adapter<MovieHolder>()
     {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity.MovieHolder {
             val ui = MyListItemBinding.inflate(layoutInflater, parent, false)   //inflate a new row from the my_list_item.xml
@@ -121,20 +73,47 @@ class MainActivity : AppCompatActivity()
         }
 
         override fun getItemCount(): Int {
-            return movies.size
+            return houses.size
         }
 
         override fun onBindViewHolder(holder: MainActivity.MovieHolder, position: Int) {
-            val movie = movies[position]   //get the data at the requested position
-            holder.ui.txtName.text = movie.title
-            holder.ui.txtYear.text = movie.year.toString()
+            val house = houses[position]   //get the data at the requested position
+            holder.ui.txtName.text = house.h_address
+            holder.ui.txtYear.text = house.h_owner
 
-            holder.ui.root.setOnClickListener {
-                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                i.putExtra(MOVIE_INDEX, position)
-                startActivity(i)
+            holder.ui.btnHouseDelete.setOnClickListener {
+
+                loadHouses()
             }
+//            holder.ui.root.setOnClickListener {
+//                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+//                i.putExtra(MOVIE_INDEX, position)
+//                startActivity(i)
+//            }
         }
+    }
+    private fun loadHouses() {
+        val db = Firebase.firestore
+        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+        val housesCollection = db.collection("houses")
+
+        ui.lblMovieCount.text = "Loading..."
+        housesCollection
+            .get()
+            .addOnSuccessListener { result ->
+                items.clear() //this line clears the list, and prevents a bug where items would be duplicated upon rotation of screen
+                Log.d(FIREBASE_TAG, "--- all houses ---")
+                for (document in result) {
+                    //Log.d(FIREBASE_TAG, document.toString())
+                    val house = document.toObject<House>()
+                    house.id = document.id
+                    Log.d(FIREBASE_TAG, house.toString())
+
+                    items.add(house)
+                }
+                (ui.myList.adapter as? MovieAdapter)?.notifyDataSetChanged()
+                ui.lblMovieCount.text = " ${items.size} Movies"
+            }
     }
 }
 

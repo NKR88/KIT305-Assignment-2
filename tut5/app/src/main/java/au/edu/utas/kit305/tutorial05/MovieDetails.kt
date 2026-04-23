@@ -19,18 +19,18 @@ class MovieDetails : AppCompatActivity() {
         val movieID = intent.getIntExtra(MOVIE_INDEX, -1)
         val movieObject = items[movieID]
         //TODO: you'll need to set txtTitle, txtYear, txtDuration yourself
-        ui.txtTitle.setText(movieObject.title)
-        ui.txtYear.setText(movieObject.year.toString())
-        ui.txtDuration.setText(movieObject.duration.toString())
+//        ui.txtTitle.setText(movieObject.title)
+//        ui.txtYear.setText(movieObject.year.toString())
+//        ui.txtDuration.setText(movieObject.duration.toString())
 
         val db = Firebase.firestore
         val moviesCollection = db.collection("movies")
 
         ui.btnSave.setOnClickListener {
             //get the user input
-            movieObject.title = ui.txtTitle.text.toString()
-            movieObject.year = ui.txtYear.text.toString().toInt() //good code would check this is really an int
-            movieObject.duration = ui.txtDuration.text.toString().toFloat() //good code would check this is really a float
+//            movieObject.title = ui.txtTitle.text.toString()
+//            movieObject.year = ui.txtYear.text.toString().toInt() //good code would check this is really an int
+//            movieObject.duration = ui.txtDuration.text.toString().toFloat() //good code would check this is really a float
 
             //update the database
             moviesCollection.document(movieObject.id!!)
