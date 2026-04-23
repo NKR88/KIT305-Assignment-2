@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity()
         //vertical list
         ui.myList.layoutManager = LinearLayoutManager(this)
 
+        val db = Firebase.firestore
+        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+
         ui.btnMenu.setOnClickListener { view ->
 
             val popup = PopupMenu(this, view)
@@ -82,15 +85,30 @@ class MainActivity : AppCompatActivity()
             holder.ui.txtYear.text = house.h_owner
 
             holder.ui.btnHouseDelete.setOnClickListener {
-
+                deleteHouse(house)
                 loadHouses()
             }
-//            holder.ui.root.setOnClickListener {
-//                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-//                i.putExtra(MOVIE_INDEX, position)
-//                startActivity(i)
-//            }
+
+            holder.ui.root.setOnDragListener {
+
+                
+            }
+
+            //holder.ui.root.setO
+            holder.ui.root.setOnClickListener {
+                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+                i.putExtra(MOVIE_INDEX, position)
+                startActivity(i)
+            }
         }
+    }
+    private fun deleteHouse(house: House) {
+        val db = Firebase.firestore
+        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+
+        db.collection("houses")
+            .document(house.id)
+            .delete()
     }
     private fun loadHouses() {
         val db = Firebase.firestore
