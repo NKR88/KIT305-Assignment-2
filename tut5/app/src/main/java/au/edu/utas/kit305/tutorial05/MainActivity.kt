@@ -15,7 +15,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
-const val MOVIE_INDEX = "Movie_Index"
+const val HOUSE_INDEX = "Movie_Index"
 val items = mutableListOf<House>()
 const val FIREBASE_TAG = "FirebaseLogging"
 
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity()
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        ui.lblMovieCount.text = "${items.size} Movies"
+        ui.lblMovieCount.text = "${items.size} Houses"
         ui.myList.adapter = MovieAdapter(houses = items)
 
         //vertical list
@@ -89,16 +89,19 @@ class MainActivity : AppCompatActivity()
                 loadHouses()
             }
 
-            holder.ui.root.setOnDragListener {
-
-                
+            holder.ui.root.setOnClickListener {
+                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
+                i.putExtra(HOUSE_INDEX, position)
+                startActivity(i)
+                true
             }
 
             //holder.ui.root.setO
-            holder.ui.root.setOnClickListener {
-                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                i.putExtra(MOVIE_INDEX, position)
+            holder.ui.root.setOnLongClickListener {
+                val i = Intent(holder.ui.root.context, HouseAdd::class.java)
+                i.putExtra(HOUSE_INDEX, position)
                 startActivity(i)
+                true
             }
         }
     }
@@ -109,6 +112,12 @@ class MainActivity : AppCompatActivity()
         db.collection("houses")
             .document(house.id)
             .delete()
+            .addOnSuccessListener {
+                Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
+            }
+            .addOnFailureListener {
+                Log.e(FIREBASE_TAG, "Error deleting House ID ${house.id}")
+            }
     }
     private fun loadHouses() {
         val db = Firebase.firestore
@@ -130,7 +139,10 @@ class MainActivity : AppCompatActivity()
                     items.add(house)
                 }
                 (ui.myList.adapter as? MovieAdapter)?.notifyDataSetChanged()
-                ui.lblMovieCount.text = " ${items.size} Movies"
+                ui.lblMovieCount.text = " ${items.size} Houses"
+            }
+            .addOnFailureListener {
+                Log.e(FIREBASE_TAG, "Error retrieving all houses")
             }
     }
 }

@@ -16,7 +16,7 @@ class MovieDetails : AppCompatActivity() {
 
         //TODO: read in movie details and display on this screen
         //get movie object using id from intent
-        val movieID = intent.getIntExtra(MOVIE_INDEX, -1)
+        val movieID = intent.getIntExtra(HOUSE_INDEX, -1)
         val movieObject = items[movieID]
         //TODO: you'll need to set txtTitle, txtYear, txtDuration yourself
 //        ui.txtTitle.setText(movieObject.title)

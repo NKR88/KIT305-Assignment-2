@@ -14,26 +14,59 @@ class  HouseAdd : AppCompatActivity() {
         ui = HouseAddBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        ui.btnHouseAdd.setOnClickListener { view ->
-            //add some data (comment this out after running the program once and confirming your data is there)
-            val db = Firebase.firestore
-            Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+        val houseID = intent.getIntExtra(HOUSE_INDEX, -1)
+        Log.d("Intent", "Intent ${houseID}")
 
-            val newHouse = House(
-                h_owner = ui.houseEditOwner.text.toString(),
-                h_address = ui.houseEditAddress.text.toString()
-            )
-            val housesCollection = db.collection("houses")
-            housesCollection
-                .add(newHouse)
-                .addOnSuccessListener {
-                    Log.d(FIREBASE_TAG, "Document created with id ${it.id}")
-                    newHouse.id = it.id
-                    finish()
-                }
-                .addOnFailureListener {
-                    Log.e(FIREBASE_TAG, "Error writing document", it)
-                }
+        if (houseID != -1) {
+            val houseObject = items[houseID]
+            ui.houseEditOwner.setText(houseObject.h_owner)
+            ui.houseEditAddress.setText(houseObject.h_address)
+
+            ui.btnHouseAdd.setText("Edit")
+            ui.btnHouseAdd.setOnClickListener { view ->
+                val db = Firebase.firestore
+                Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+
+                val newHouse = House(
+                    h_owner = ui.houseEditOwner.text.toString(),
+                    h_address = ui.houseEditAddress.text.toString()
+                )
+                db.collection("houses")
+                    .document(houseObject.id)
+                    .update(
+                        "h_owner", newHouse.h_owner,
+                        "h_address", newHouse.h_address
+                    )
+                    .addOnSuccessListener {
+                        Log.d(FIREBASE_TAG, "House ID ${houseObject.id} updated")
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Log.e(FIREBASE_TAG, "Error updating House ID", it)
+                    }
+            }
+        }
+        else {
+            ui.btnHouseAdd.setOnClickListener { view ->
+                val db = Firebase.firestore
+                Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+
+                val newHouse = House(
+                    h_owner = ui.houseEditOwner.text.toString(),
+                    h_address = ui.houseEditAddress.text.toString()
+                )
+                val housesCollection = db.collection("houses")
+                housesCollection
+                    .add(newHouse)
+                    .addOnSuccessListener {
+                        Log.d(FIREBASE_TAG, "House created with id ${it.id}")
+                        newHouse.id = it.id
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Log.e(FIREBASE_TAG, "Error writing House", it)
+                    }
+            }
         }
         ui.btnHouseCancel.setOnClickListener { view ->
             finish()
