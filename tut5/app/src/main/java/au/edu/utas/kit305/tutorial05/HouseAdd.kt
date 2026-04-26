@@ -51,6 +51,18 @@ class  HouseAdd : AppCompatActivity() {
                 val db = Firebase.firestore
                 Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
+                if (ui.houseEditOwner.text.toString() == "" || ui.houseEditAddress.text.toString() == "") {
+                    androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
+                        .setTitle("Invalid")
+                        .setMessage("")
+                        .setPositiveButton("Delete") { _, _ ->
+                            deleteHouse(house)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+                }
+
                 val newHouse = House(
                     h_owner = ui.houseEditOwner.text.toString(),
                     h_address = ui.houseEditAddress.text.toString()

@@ -74,7 +74,7 @@ class MainActivity3 : AppCompatActivity()
 
     inner class SpaceAdapter(private val spaces: MutableList<Space>) : RecyclerView.Adapter<SpaceHolder>()
     {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity2.SpaceHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity3.SpaceHolder {
             val ui = SpaceItemBinding.inflate(layoutInflater, parent, false)   //inflate a new row from the my_list_item.xml
             return SpaceHolder(ui)                                                            //wrap it in a ViewHolder
         }
@@ -83,7 +83,7 @@ class MainActivity3 : AppCompatActivity()
             return spaces.size
         }
 
-        override fun onBindViewHolder(holder: MainActivity2.SpaceHolder, position: Int) {
+        override fun onBindViewHolder(holder: MainActivity3.SpaceHolder, position: Int) {
             val space = spaces[position]   //get the data at the requested position
             holder.ui.txtName.text = space.s_name
 
@@ -102,7 +102,7 @@ class MainActivity3 : AppCompatActivity()
                 }
 
                 holder.ui.root.setOnClickListener {
-                    val i = Intent(holder.ui.root.context, MainActivity2::class.java)
+                    val i = Intent(holder.ui.root.context, MainActivity3::class.java)
                     i.putExtra(HOUSE_ID, houseId)
                     i.putExtra(ROOM_ID, space.id)!!
                     startActivity(i)

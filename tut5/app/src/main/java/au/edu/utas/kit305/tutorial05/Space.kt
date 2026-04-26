@@ -8,5 +8,6 @@ class Space (
     var s_type : String = "",
     var s_name : String = "",
     var s_width : Int = 0,
-    var s_height : Int = 0
+    var s_height : Int = 0,
+    var s_product : String = ""
 )
