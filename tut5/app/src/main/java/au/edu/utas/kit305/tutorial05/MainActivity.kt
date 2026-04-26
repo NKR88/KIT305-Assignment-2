@@ -16,8 +16,11 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
 const val HOUSE_INDEX = "Movie_Index"
-val items = mutableListOf<House>()
+val h_items = mutableListOf<House>()
 const val FIREBASE_TAG = "FirebaseLogging"
+
+const val HOUSE_ID:String = "HOUSE_ID"
+const val ROOM_ID:String = "ROOM_ID" // i think i delcare it here incase i need it up here???
 
 class MainActivity : AppCompatActivity()
 {
@@ -29,19 +32,16 @@ class MainActivity : AppCompatActivity()
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        ui.lblMovieCount.text = "${items.size} Houses"
-        ui.myList.adapter = MovieAdapter(houses = items)
+        ui.lblMovieCount.text = "${h_items.size} Houses"
+        ui.myList.adapter = MovieAdapter(houses = h_items)
 
         //vertical list
         ui.myList.layoutManager = LinearLayoutManager(this)
 
-        val db = Firebase.firestore
-        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
-
         ui.btnMenu.setOnClickListener { view ->
 
             val popup = PopupMenu(this, view)
-            popup.menuInflater.inflate(R.menu.house_menu, popup.menu)
+            popup.menuInflater.inflate(R.menu.uni_menu, popup.menu)
 
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -84,39 +84,70 @@ class MainActivity : AppCompatActivity()
             holder.ui.txtName.text = house.h_address
             holder.ui.txtYear.text = house.h_owner
 
-            holder.ui.btnHouseDelete.setOnClickListener {
-                deleteHouse(house)
-                loadHouses()
-            }
+            if (house.id != null) {
 
-            holder.ui.root.setOnClickListener {
-                val i = Intent(holder.ui.root.context, MovieDetails::class.java)
-                i.putExtra(HOUSE_INDEX, position)
-                startActivity(i)
-                true
-            }
+                holder.ui.btnHouseDelete.setOnClickListener {
+                    androidx.appcompat.app.AlertDialog.Builder(holder.ui.root.context)
+                        .setTitle("Delete")
+                        .setMessage("${house.h_address}")
+                        .setPositiveButton("Delete") { _, _ ->
+                            deleteHouse(house)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
 
-            //holder.ui.root.setO
-            holder.ui.root.setOnLongClickListener {
-                val i = Intent(holder.ui.root.context, HouseAdd::class.java)
-                i.putExtra(HOUSE_INDEX, position)
-                startActivity(i)
-                true
+                holder.ui.root.setOnClickListener {
+                    val i = Intent(holder.ui.root.context, MainActivity2::class.java)
+                    i.putExtra(HOUSE_ID, house.id)
+                    startActivity(i)
+                    true
+                }
+
+                //holder.ui.root.setO
+                holder.ui.root.setOnLongClickListener {
+                    val i = Intent(holder.ui.root.context, HouseAdd::class.java)
+                    i.putExtra(HOUSE_INDEX, position)
+                    startActivity(i)
+                    true
+                }
+            }
+            else {
+                throw NullPointerException("house.id is null") // i feel like a real dev :')
             }
         }
     }
+
+    // used AI to learn about batch for firebase
     private fun deleteHouse(house: House) {
         val db = Firebase.firestore
         Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
         db.collection("houses")
             .document(house.id)
-            .delete()
-            .addOnSuccessListener {
-                Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
-            }
-            .addOnFailureListener {
-                Log.e(FIREBASE_TAG, "Error deleting House ID ${house.id}")
+            .collection("rooms")
+            .get()
+            .addOnSuccessListener { rooms ->
+
+                val batch = db.batch()
+
+                for (room in rooms.documents) {
+                    batch.delete(room.reference)
+                }
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        db.collection("houses")
+                            .document(house.id)
+                            .delete()
+                            .addOnSuccessListener {
+                                Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
+                                loadHouses()
+                            }
+                            .addOnFailureListener {
+                                Log.e(FIREBASE_TAG, "Error deleting House ID ${house.id}")
+                            }
+                    }
             }
     }
     private fun loadHouses() {
@@ -128,7 +159,7 @@ class MainActivity : AppCompatActivity()
         housesCollection
             .get()
             .addOnSuccessListener { result ->
-                items.clear() //this line clears the list, and prevents a bug where items would be duplicated upon rotation of screen
+                h_items.clear() //this line clears the list, and prevents a bug where items would be duplicated upon rotation of screen
                 Log.d(FIREBASE_TAG, "--- all houses ---")
                 for (document in result) {
                     //Log.d(FIREBASE_TAG, document.toString())
@@ -136,10 +167,10 @@ class MainActivity : AppCompatActivity()
                     house.id = document.id
                     Log.d(FIREBASE_TAG, house.toString())
 
-                    items.add(house)
+                    h_items.add(house)
                 }
                 (ui.myList.adapter as? MovieAdapter)?.notifyDataSetChanged()
-                ui.lblMovieCount.text = " ${items.size} Houses"
+                ui.lblMovieCount.text = " ${h_items.size} Houses"
             }
             .addOnFailureListener {
                 Log.e(FIREBASE_TAG, "Error retrieving all houses")

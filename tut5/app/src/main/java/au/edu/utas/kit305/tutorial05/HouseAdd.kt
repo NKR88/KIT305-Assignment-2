@@ -18,7 +18,7 @@ class  HouseAdd : AppCompatActivity() {
         Log.d("Intent", "Intent ${houseID}")
 
         if (houseID != -1) {
-            val houseObject = items[houseID]
+            val houseObject = h_items[houseID]
             ui.houseEditOwner.setText(houseObject.h_owner)
             ui.houseEditAddress.setText(houseObject.h_address)
 
