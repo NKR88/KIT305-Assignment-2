@@ -31,6 +31,8 @@
         <activity android:name=".HouseAdd" />
         <activity android:name=".RoomAdd" />
         <activity android:name=".SpaceAdd" />
+        <activity android:name=".ProductSelect" />
+
     </application>
 
 </manifest>

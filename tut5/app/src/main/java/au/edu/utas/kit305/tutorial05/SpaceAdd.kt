@@ -110,13 +110,6 @@ class  SpaceAdd : AppCompatActivity() {
                         .show()
                 } else {
 
-                    val i = Intent(this.ui.root.context, Product::class.java)
-                    i.putExtra(HOUSE_ID, au.edu.utas.kit305.tutorial05.houseId)
-                    i.putExtra(ROOM_ID, au.edu.utas.kit305.tutorial05.roomId)
-                    i.putExtra(SPACE_ID, space.id)!!
-                    startActivity(i)
-                    true
-
                     val newSpace = Space(
                         s_name = ui.spaceEditName.text.toString(),
                         s_width = ui.spaceEditWidth.text.toString().toIntOrNull() ?: 0,
@@ -124,6 +117,7 @@ class  SpaceAdd : AppCompatActivity() {
                         s_product = ui.btnSpaceProduct.text.toString(),
                         s_type = ui.spaceEditType.selectedItem.toString()
                     )
+
                     val spacesCollection =
                         db.collection("houses")
                             .document(houseId)
@@ -135,7 +129,16 @@ class  SpaceAdd : AppCompatActivity() {
                         .addOnSuccessListener {
                             Log.d(FIREBASE_TAG, "Space created with id ${it.id}")
                             newSpace.id = it.id
-                            finish()
+
+                            // once suceful take all to new activity
+                            val i = Intent(this, Product::class.java)
+                            i.putExtra("WIDTH", newSpace.s_width)
+                            i.putExtra("HEIGHT", newSpace.s_height)
+                            i.putExtra(HOUSE_ID, houseId)
+                            i.putExtra(ROOM_ID, roomId)
+                            i.putExtra(SPACE_ID, newSpace.id)
+                            startActivity(i)
+                            true
                         }
                         .addOnFailureListener {
                             Log.e(FIREBASE_TAG, "Error writing Space", it)
@@ -144,5 +147,8 @@ class  SpaceAdd : AppCompatActivity() {
             }
         }
         ui.btnSpaceCancel.setOnClickListener { view -> finish() }
+    }
+    override fun onResume() {
+        super.onResume()
     }
 }
