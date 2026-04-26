@@ -3,71 +3,100 @@ package au.edu.utas.kit305.tutorial05
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import au.edu.utas.kit305.tutorial05.databinding.RoomAddBinding
+import au.edu.utas.kit305.tutorial05.databinding.SpaceAddBinding
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class  SpaceAdd : AppCompatActivity() {
-    private lateinit var ui: RoomAddBinding
+    private lateinit var ui: SpaceAddBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ui = RoomAddBinding.inflate(layoutInflater)
+        ui = SpaceAddBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        val roomID = intent.getIntExtra(ROOM_INDEX, -1)
+        val spaceID = intent.getIntExtra(SPACE_INDEX, -1)
         val houseId = intent.getStringExtra(HOUSE_ID)!! // null checking already handled
-        Log.d("Intent", "Intent ${roomID}")
+        val roomId = intent.getStringExtra(ROOM_ID)!! // null checking already handled
 
-        if (roomID != -1) {
-            val roomObject = r_items[roomID]
-            ui.roomEditName.setText(roomObject.r_name)
+        Log.d("Intent", "Intent ${spaceID}")
 
-            ui.btnRoomAdd.setText("Edit")
-            ui.btnRoomAdd.setOnClickListener { view ->
+        if (spaceID != -1) {
+            val spaceObject = s_items[spaceID]
+            ui.spaceEditName.setText(spaceObject.s_name)
+            ui.spaceEditWidth.setText(spaceObject.s_width)
+            ui.spaceEditHeight.setText(spaceObject.s_height)
+
+
+            ui.btnSpaceAdd.setText("Edit")
+            ui.btnSpaceAdd.setOnClickListener { view ->
                 val db = Firebase.firestore
                 Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
-                val newRoom = Room(
-                    r_name = ui.roomEditName.text.toString(),
+                val newSpace = Space(
+                    s_name = ui.spaceEditName.text.toString(),
                 )
                 db.collection("houses")
                     .document(houseId)
                     .collection("rooms")
-                    .document(roomObject.id)
+                    .document(roomId)
+                    .collection("spaces")
+                    .document(spaceObject.id)
                     .update(
-                        "r_name", newRoom.r_name
+                        "s_name", newSpace.s_name,
+                        "s_width", newSpace.s_width,
+                        "s_height", newSpace.s_height
                     )
                     .addOnSuccessListener {
-                        Log.d(FIREBASE_TAG, "Room ID ${roomObject.id} updated")
+                        Log.d(FIREBASE_TAG, "Space ID ${spaceObject.id} updated")
                         finish()
                     }
                     .addOnFailureListener {
-                        Log.e(FIREBASE_TAG, "Error updating Room ID", it)
+                        Log.e(FIREBASE_TAG, "Error updating Space ID", it)
                     }
             }
         }
         else {
-            ui.btnRoomAdd.setOnClickListener { view ->
+            ui.btnSpaceAdd.setOnClickListener { view ->
                 val db = Firebase.firestore
                 Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
-                val newRoom = Room(
-                    r_name = ui.roomEditName.text.toString()
+                val name = ui.spaceEditName.text.toString()
+                val width = ui.spaceEditWidth.text.toString().toIntOrNull()
+                val height = ui.spaceEditHeight.text.toString().toIntOrNull()
+                val product = ui.btnSpaceAdd.text.toString()
+
+                if (name == "" ||
+                    width == 0 ||
+                    height == 0 ||
+                    product == "Select") {
+                    androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
+                        .setTitle("Invalid")
+                        .setMessage("Fill out everything to continue")
+                        .setPositiveButton("Ok", null)
+                        .show()
+                }
+
+                val newSpace = Space(
+                    s_name = ui.spaceEditName.text.toString(),
+                    s_width = ui.spaceEditWidth.text.toString().toIntOrNull() ?: 0,
+                    s_height = ui.spaceEditHeight.text.toString().toIntOrNull() ?: 0,
+                    s_product = ui.btnSpaceProduct.text.toString()
                 )
-                val roomsCollection = db.collection("houses").document(houseId).collection("rooms")
-                roomsCollection
-                    .add(newRoom)
+
+                val spacesCollection = db.collection("houses").document(houseId).collection("spaces")
+                spacesCollection
+                    .add(newSpace)
                     .addOnSuccessListener {
-                        Log.d(FIREBASE_TAG, "Room created with id ${it.id}")
-                        newRoom.id = it.id
+                        Log.d(FIREBASE_TAG, "Space created with id ${it.id}")
+                        newSpace.id = it.id
                         finish()
                     }
                     .addOnFailureListener {
-                        Log.e(FIREBASE_TAG, "Error writing Room", it)
+                        Log.e(FIREBASE_TAG, "Error writing Space", it)
                     }
             }
         }
-        ui.btnRoomCancel.setOnClickListener { view ->
+        ui.btnSpaceCancel.setOnClickListener { view ->
             finish()
         }
     }

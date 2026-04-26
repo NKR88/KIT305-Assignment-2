@@ -54,30 +54,27 @@ class  HouseAdd : AppCompatActivity() {
                 if (ui.houseEditOwner.text.toString() == "" || ui.houseEditAddress.text.toString() == "") {
                     androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
                         .setTitle("Invalid")
-                        .setMessage("")
-                        .setPositiveButton("Delete") { _, _ ->
-                            deleteHouse(house)
-                        }
-                        .setNegativeButton("Cancel", null)
+                        .setMessage("Fill out everything to continue")
+                        .setPositiveButton("Ok", null)
                         .show()
                 }
+                else {
+                    val newHouse = House(
+                        h_owner = ui.houseEditOwner.text.toString(),
+                        h_address = ui.houseEditAddress.text.toString()
+                    )
+                    val housesCollection = db.collection("houses")
+                    housesCollection
+                        .add(newHouse)
+                        .addOnSuccessListener {
+                            Log.d(FIREBASE_TAG, "House created with id ${it.id}")
+                            newHouse.id = it.id
+                            finish()
+                        }
+                        .addOnFailureListener {
+                            Log.e(FIREBASE_TAG, "Error writing House", it)
+                        }
                 }
-
-                val newHouse = House(
-                    h_owner = ui.houseEditOwner.text.toString(),
-                    h_address = ui.houseEditAddress.text.toString()
-                )
-                val housesCollection = db.collection("houses")
-                housesCollection
-                    .add(newHouse)
-                    .addOnSuccessListener {
-                        Log.d(FIREBASE_TAG, "House created with id ${it.id}")
-                        newHouse.id = it.id
-                        finish()
-                    }
-                    .addOnFailureListener {
-                        Log.e(FIREBASE_TAG, "Error writing House", it)
-                    }
             }
         }
         ui.btnHouseCancel.setOnClickListener { view ->

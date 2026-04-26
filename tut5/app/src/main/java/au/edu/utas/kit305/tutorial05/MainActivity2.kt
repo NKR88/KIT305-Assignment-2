@@ -99,7 +99,7 @@ class MainActivity2 : AppCompatActivity()
                 }
 
                 holder.ui.root.setOnClickListener {
-                    val i = Intent(holder.ui.root.context, MainActivity2::class.java)
+                    val i = Intent(holder.ui.root.context, MainActivity3::class.java)
                     i.putExtra(HOUSE_ID, houseId)
                     i.putExtra(ROOM_ID, room.id)!!
                     startActivity(i)

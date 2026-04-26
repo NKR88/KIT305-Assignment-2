@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.edu.utas.kit305.tutorial05.databinding.ActivityMain2Binding
+import au.edu.utas.kit305.tutorial05.databinding.ActivityMain3Binding
 import au.edu.utas.kit305.tutorial05.databinding.SpaceItemBinding
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
@@ -23,12 +23,12 @@ private var roomId : String = "ROOM_ID"
 
 class MainActivity3 : AppCompatActivity()
 {
-    private lateinit var ui : ActivityMain2Binding
+    private lateinit var ui : ActivityMain3Binding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ui = ActivityMain2Binding.inflate(layoutInflater)
+        ui = ActivityMain3Binding.inflate(layoutInflater)
         setContentView(ui.root)
 
         houseId = intent.getStringExtra(HOUSE_ID)!! // put null check in MainActivity
@@ -54,6 +54,7 @@ class MainActivity3 : AppCompatActivity()
                     R.id.menu_add -> {
                         val i = Intent(this, SpaceAdd::class.java)
                         i.putExtra(HOUSE_ID, houseId)
+                        i.putExtra(ROOM_ID, roomId)
                         startActivity(i)
                     }
                 }
@@ -86,6 +87,8 @@ class MainActivity3 : AppCompatActivity()
         override fun onBindViewHolder(holder: MainActivity3.SpaceHolder, position: Int) {
             val space = spaces[position]   //get the data at the requested position
             holder.ui.txtName.text = space.s_name
+            holder.ui.txtType.text = space.s_type
+            holder.ui.txtWH.text = "${space.s_width}mm x ${space.s_height}mm"
 
             if (space.id != null) {
 
@@ -104,7 +107,8 @@ class MainActivity3 : AppCompatActivity()
                 holder.ui.root.setOnClickListener {
                     val i = Intent(holder.ui.root.context, MainActivity3::class.java)
                     i.putExtra(HOUSE_ID, houseId)
-                    i.putExtra(ROOM_ID, space.id)!!
+                    i.putExtra(ROOM_ID, roomId)
+                    i.putExtra(SPACE_ID, space.id)!!
                     startActivity(i)
                     true
                 }
@@ -114,6 +118,8 @@ class MainActivity3 : AppCompatActivity()
                     val i = Intent(holder.ui.root.context, SpaceAdd::class.java)
                     i.putExtra(ROOM_INDEX, position)
                     i.putExtra(HOUSE_ID, houseId)
+                    i.putExtra(ROOM_ID, roomId)
+
                     startActivity(i)
                     true
                 }

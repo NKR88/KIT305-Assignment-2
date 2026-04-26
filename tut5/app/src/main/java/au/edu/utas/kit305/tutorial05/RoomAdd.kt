@@ -51,20 +51,30 @@ class  RoomAdd : AppCompatActivity() {
                 val db = Firebase.firestore
                 Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
-                val newRoom = Room(
-                    r_name = ui.roomEditName.text.toString()
-                )
-                val roomsCollection = db.collection("houses").document(houseId).collection("rooms")
-                roomsCollection
-                    .add(newRoom)
-                    .addOnSuccessListener {
-                        Log.d(FIREBASE_TAG, "Room created with id ${it.id}")
-                        newRoom.id = it.id
-                        finish()
-                    }
-                    .addOnFailureListener {
-                        Log.e(FIREBASE_TAG, "Error writing Room", it)
-                    }
+                if (ui.roomEditName.text.toString() == "") {
+                    androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
+                        .setTitle("Invalid")
+                        .setMessage("Fill out everything to continue")
+                        .setPositiveButton("Ok", null)
+                        .show()
+                }
+                else {
+                    val newRoom = Room(
+                        r_name = ui.roomEditName.text.toString()
+                    )
+                    val roomsCollection =
+                        db.collection("houses").document(houseId).collection("rooms")
+                    roomsCollection
+                        .add(newRoom)
+                        .addOnSuccessListener {
+                            Log.d(FIREBASE_TAG, "Room created with id ${it.id}")
+                            newRoom.id = it.id
+                            finish()
+                        }
+                        .addOnFailureListener {
+                            Log.e(FIREBASE_TAG, "Error writing Room", it)
+                        }
+                }
             }
         }
         ui.btnRoomCancel.setOnClickListener { view ->

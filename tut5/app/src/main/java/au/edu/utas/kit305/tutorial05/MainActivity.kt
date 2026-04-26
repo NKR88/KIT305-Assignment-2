@@ -21,6 +21,7 @@ const val FIREBASE_TAG = "FirebaseLogging"
 
 const val HOUSE_ID:String = "HOUSE_ID"
 const val ROOM_ID:String = "ROOM_ID" // i think i delcare it here incase i need it up here???
+const val SPACE_ID:String = "SPACE_ID"
 
 class MainActivity : AppCompatActivity()
 {
