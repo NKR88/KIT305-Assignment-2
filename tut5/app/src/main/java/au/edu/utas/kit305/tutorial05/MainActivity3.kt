@@ -116,7 +116,7 @@ class MainActivity3 : AppCompatActivity()
                 //holder.ui.root.setO
                 holder.ui.root.setOnLongClickListener {
                     val i = Intent(holder.ui.root.context, SpaceAdd::class.java)
-                    i.putExtra(ROOM_INDEX, position)
+                    i.putExtra(SPACE_INDEX, position)
                     i.putExtra(HOUSE_ID, houseId)
                     i.putExtra(ROOM_ID, roomId)
 
@@ -136,6 +136,8 @@ class MainActivity3 : AppCompatActivity()
 
         db.collection("houses")
             .document(houseId)
+            .collection("rooms")
+            .document(roomId)
             .collection("spaces")
             .document(space.id)
             .delete()
@@ -150,7 +152,12 @@ class MainActivity3 : AppCompatActivity()
     private fun loadSpaces() {
         val db = Firebase.firestore
         Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
-        val spacesCollection = db.collection("houses").document(houseId).collection("spaces")
+        val spacesCollection =
+            db.collection("houses")
+                .document(houseId)
+                .collection("rooms")
+                .document(roomId)
+                .collection("spaces")
 
         ui.lblSpaceCount.text = "Loading..."
         spacesCollection
