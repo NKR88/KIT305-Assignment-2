@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/spaceUnit"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/spaceEditName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="-11dp"
+        android:hint="@string/enter_hint"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toEndOf="@+id/spaceName"
+        app:layout_constraintTop_toTopOf="@+id/spaceName" />
+
+    <EditText
+        android:id="@+id/spaceEditHeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-11dp"
+        android:hint="@string/enter_hint"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="@+id/spaceEditName"
+        app:layout_constraintTop_toTopOf="@+id/spaceAddress" />
+
+    <EditText
+        android:id="@+id/spaceEditWidth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-11dp"
+        android:hint="@string/enter_hint"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="@+id/spaceEditName"
+        app:layout_constraintTop_toTopOf="@+id/spaceWidth" />
+
+    <TextView
+        android:id="@+id/spaceWidth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Width"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="@+id/spaceType"
+        app:layout_constraintTop_toBottomOf="@+id/spaceType" />
+
+    <TextView
+        android:id="@+id/spaceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp"
+        android:text="Name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spaceTitle" />
+
+    <TextView
+        android:id="@+id/spaceAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Height"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="@+id/spaceWidth"
+        app:layout_constraintTop_toBottomOf="@+id/spaceWidth" />
+
+    <TextView
+        android:id="@+id/spaceType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Type"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="@+id/spaceName"
+        app:layout_constraintTop_toBottomOf="@+id/spaceName" />
+
+    <TextView
+        android:id="@+id/spaceTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Space"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSpaceAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Add"
+        app:layout_constraintEnd_toStartOf="@+id/btnSpaceCancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spaceAddress" />
+
+    <Button
+        android:id="@+id/btnSpaceCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnSpaceAdd"
+        app:layout_constraintTop_toBottomOf="@+id/spaceAddress" />
+
+    <Spinner
+        android:id="@+id/spaceEditType"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/spaceType"
+        app:layout_constraintStart_toStartOf="@+id/spaceEditName"
+        app:layout_constraintTop_toTopOf="@+id/spaceType" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="6dp"
+        android:text="mm"
+        app:layout_constraintBottom_toBottomOf="@+id/spaceEditWidth"
+        app:layout_constraintStart_toEndOf="@+id/spaceEditWidth" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="6dp"
+        android:text="mm"
+        app:layout_constraintBottom_toBottomOf="@+id/spaceEditHeight"
+        app:layout_constraintStart_toEndOf="@+id/spaceEditHeight" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

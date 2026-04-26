@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txtTitle" />
 
     <EditText
-        android:id="@+id/txtYear"
+        android:id="@+id/txtWH"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -70,5 +70,5 @@
         android:text="Save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtYear" />
+        app:layout_constraintTop_toBottomOf="@+id/txtWH" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,6 +30,7 @@
         <activity android:name=".MovieDetails" />
         <activity android:name=".HouseAdd" />
         <activity android:name=".RoomAdd" />
+        <activity android:name=".SpaceAdd" />
     </application>
 
 </manifest>
