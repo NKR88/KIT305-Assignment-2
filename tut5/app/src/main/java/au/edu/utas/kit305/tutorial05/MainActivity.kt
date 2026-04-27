@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.menu_quote -> {
-
+                        val i = Intent(this, QuoteActivity::class.java)
+                        startActivity(i)
                     }
 
                     R.id.menu_add -> {
@@ -128,14 +129,24 @@ class MainActivity : AppCompatActivity() {
     // used AI to learn about batch for firebase
     private fun deleteHouse(house: House) {
         val db = Firebase.firestore
-        Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
 
         db.collection("houses")
             .document(house.id)
             .collection("rooms")
             .get()
             .addOnSuccessListener { rooms ->
-                var remaining = rooms.size()
+
+                val batch = db.batch()
+
+                // track how many room/space fetches are still pending
+                var pending = rooms.size()
+
+                // edge case: house has no rooms at all
+                if (pending == 0) {
+                    db.collection("houses").document(house.id).delete()
+                        .addOnSuccessListener { loadHouses() }
+                    return@addOnSuccessListener
+                }
 
                 for (room in rooms.documents) {
                     room.reference
@@ -143,24 +154,23 @@ class MainActivity : AppCompatActivity() {
                         .get()
                         .addOnSuccessListener { spaces ->
 
-                            val batch = db.batch()
-
                             for (space in spaces.documents) {
                                 batch.delete(space.reference)
                             }
-
                             batch.delete(room.reference)
 
-                            batch.commit()
-                                .addOnSuccessListener {
-                                    db.collection("houses")
-                                        .document(house.id)
-                                        .delete()
+                            pending--
+
+                            // only delete the house once ALL rooms are done
+                            if (pending == 0) {
+                                batch.commit().addOnSuccessListener {
+                                    db.collection("houses").document(house.id).delete()
                                         .addOnSuccessListener {
                                             Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
                                             loadHouses()
                                         }
                                 }
+                            }
                         }
                 }
             }

@@ -49,7 +49,8 @@ class MainActivity3 : AppCompatActivity()
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.menu_quote -> {
-
+                        val i = Intent(this, QuoteActivity::class.java)
+                        startActivity(i)
                     }
                     R.id.menu_add -> {
                         val i = Intent(this, SpaceAdd::class.java)
