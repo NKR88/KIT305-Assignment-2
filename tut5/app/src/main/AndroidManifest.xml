@@ -13,6 +13,9 @@
         android:theme="@style/Theme.AndroidTutorial5"
         tools:targetApi="31">
         <activity
+            android:name=".MainActivityQuote"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity3"
             android:exported="false" />
         <activity
@@ -32,7 +35,6 @@
         <activity android:name=".RoomAdd" />
         <activity android:name=".SpaceAdd" />
         <activity android:name=".ProductSelect" />
-
     </application>
 
 </manifest>
