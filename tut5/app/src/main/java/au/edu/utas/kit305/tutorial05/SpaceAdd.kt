@@ -98,18 +98,18 @@ class  SpaceAdd : AppCompatActivity() {
 
                 Log.d("DEBUG", type)
 
-//                if (name == "" ||
-//                    width == 0 ||
-//                    height == 0 ||
-//                    type == "Select"
-//                ) {
-//                    androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
-//                        .setTitle("Invalid")
-//                        .setMessage("Fill out everything to continue")
-//                        .setPositiveButton("Ok", null)
-//                        .show()
-//                } else {
-//
+                if (name == "" ||
+                    width == 0 ||
+                    height == 0 ||
+                    type == "Select"
+                ) {
+                    androidx.appcompat.app.AlertDialog.Builder(ui.root.context)
+                        .setTitle("Invalid")
+                        .setMessage("Fill out everything to continue")
+                        .setPositiveButton("Ok", null)
+                        .show()
+                } else {
+
                     val newSpace = Space(
                         s_name = ui.spaceEditName.text.toString(),
                         s_width = ui.spaceEditWidth.text.toString().toIntOrNull() ?: 0,
@@ -117,7 +117,7 @@ class  SpaceAdd : AppCompatActivity() {
                         s_product = ui.btnSpaceProduct.text.toString(),
                         s_type = ui.spaceEditType.selectedItem.toString()
                     )
-//
+
 //                    val spacesCollection =
 //                        db.collection("houses")
 //                            .document(houseId)
@@ -129,11 +129,12 @@ class  SpaceAdd : AppCompatActivity() {
 //                        .addOnSuccessListener {
 //                            Log.d(FIREBASE_TAG, "Space created with id ${it.id}")
 //                            newSpace.id = it.id
-//
+
                             // once suceful take all to new activity
                             val i = Intent(this, ProductSelect::class.java)
                             i.putExtra("WIDTH", newSpace.s_width)
                             i.putExtra("HEIGHT", newSpace.s_height)
+                            i.putExtra("TYPE", newSpace.s_type)
                             i.putExtra(HOUSE_ID, houseId)
                             i.putExtra(ROOM_ID, roomId)
                             i.putExtra(SPACE_ID, newSpace.id)
@@ -143,10 +144,10 @@ class  SpaceAdd : AppCompatActivity() {
 //                        .addOnFailureListener {
 //                            Log.e(FIREBASE_TAG, "Error writing Space", it)
 //                        }
-//                }
+                }
             }
         }
-        ui.btnSpaceCancel.setOnClickListener { view -> finish() }
+        ui.btnSpaceCancel.visibility = View.GONE
     }
     override fun onResume() {
         super.onResume()

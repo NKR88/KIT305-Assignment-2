@@ -7,11 +7,21 @@ import java.net.URL
 
 object ProductApi {
 
-    fun fetchProducts(): List<Product> {
+    fun fetchProducts(type : String): List<Product> {
         val products = mutableListOf<Product>()
 
         try {
-            val url = URL("https://utasbot.dev/kit305_2026/product")
+
+            var url = URL("https://utasbot.dev/kit305_2026/product")
+
+            if (type == "Window") {
+                url = URL("https://utasbot.dev/kit305_2026/product?category=window")
+
+            } else if (type == "Floor") {
+                url = URL("https://utasbot.dev/kit305_2026/product?category=floor")
+
+            }
+
             val connection = url.openConnection() as HttpURLConnection
 
             connection.requestMethod = "GET"

@@ -11,27 +11,69 @@ import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.kit305.tutorial05.databinding.ProductItemBinding
 import au.edu.utas.kit305.tutorial05.databinding.ProductMainBinding
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 val p_items = mutableListOf<Product>()
 
 class  ProductSelect : AppCompatActivity() {
     private lateinit var ui: ProductMainBinding
+
+    private lateinit var spaceId: String
+    private lateinit var houseId: String
+    private lateinit var roomId: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ProductMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
+
+        spaceId = intent.getStringExtra(SPACE_ID)!!
+        houseId = intent.getStringExtra(HOUSE_ID)!! // null checking already handled
+        roomId = intent.getStringExtra(ROOM_ID)!! // null checking already handled
+
+        val spaceWidth = intent.getIntExtra("WIDTH", 0)
+        val spaceHeight = intent.getIntExtra("HEIGHT", 0)
+        val spaceType = intent.getStringExtra("TYPE")
 
         ui.myList.layoutManager = LinearLayoutManager(this)
 
         ui.myList.adapter = ProductAdapter(p_items)
         // obviously all AI but i made sure to try to understand it
         Thread {
-            val products = ProductApi.fetchProducts()
+            Log.d("DEBUG", "This is space tpye -> ${spaceType}")
+            val products = ProductApi.fetchProducts(spaceType!!)
+            var filtered = products
+
+            if (spaceType == "Window") {
+                filtered = products.filter {
+
+                    // if window then these wont be null
+                    val minH = it.min_height!!
+                    val maxH = it.max_height!!
+                    val minW = it.min_width!!
+                    val maxW = it.max_width!!
+
+                    spaceHeight in minH..maxH && (
+                            spaceWidth in minW..maxW || (
+                                spaceWidth > maxW &&
+                                run {
+                                    val minPanels = Math.ceil(spaceWidth.toDouble() / maxW).toInt()
+                                    val maxPanels = Math.floor(spaceWidth.toDouble() / minW).toInt()
+                                    minPanels <= maxPanels
+                                }
+                            ) || (
+                                minW == maxW &&
+                                spaceWidth % minW == 0
+                            )
+                    )
+                }
+            }
 
             runOnUiThread {
                 p_items.clear()
-                p_items.addAll(products)
+                p_items.addAll(filtered)
                 ui.myList.adapter?.notifyDataSetChanged()
             }
         }.start()
@@ -52,6 +94,7 @@ class  ProductSelect : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ProductSelect.ProductHolder, position: Int) {
             val product = products[position]   //get the data at the requested position
+
             holder.ui.txtName.text = product.name
             holder.ui.txtDesc.text = product.description
             holder.ui.txtPrice.text = "$${product.price_per_sqm} per sqr metre"
@@ -72,11 +115,27 @@ class  ProductSelect : AppCompatActivity() {
             }
             holder.ui.spinnerColor.adapter = spinnerAdapter
 
-
             holder.ui.root.setOnClickListener {
-                val i = Intent(holder.ui.root.context, MainActivity3::class.java)
-                startActivity(i)
-                true
+
+//                val db = Firebase.firestore
+//                Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+//
+//                db.collection("houses")
+//                    .document(houseId)
+//                    .collection("rooms")
+//                    .document(roomId)
+//                    .collection("spaces")
+//                    .document(spaceId)
+//                    .update(
+//                        "s_product", product,
+//                    )
+//                    .addOnSuccessListener {
+//                        Log.d(FIREBASE_TAG, "Space has ${product.id} id")
+                        finishAffinity()
+//                    }
+//                    .addOnFailureListener {
+//                        Log.e(FIREBASE_TAG, "Error updating Space ID", it)
+//                    }
             }
         }
     }
