@@ -129,13 +129,29 @@ class MainActivity2 : AppCompatActivity()
             .document(houseId)
             .collection("rooms")
             .document(room.id)
-            .delete()
-            .addOnSuccessListener {
-                Log.d(FIREBASE_TAG, "Room ID ${room.id} deleted")
-                loadRooms()
-            }
-            .addOnFailureListener {
-                Log.e(FIREBASE_TAG, "Error deleting Room ID ${room.id}")
+            .collection("spaces")
+            .get()
+            .addOnSuccessListener { spaces ->
+                val batch = db.batch()
+
+                for (space in spaces.documents) {
+                    batch.delete(space.reference)
+                }
+                batch.commit()
+                    .addOnSuccessListener {
+                        db.collection("houses")
+                            .document(houseId)
+                            .collection("rooms")
+                            .document(room.id)
+                            .delete()
+                            .addOnSuccessListener {
+                                Log.d(FIREBASE_TAG, "Room ID ${room.id} deleted")
+                                loadRooms()
+                            }
+                            .addOnFailureListener {
+                                Log.e(FIREBASE_TAG, "Error deleting Room ID ${room.id}")
+                            }
+                    }
             }
     }
     private fun loadRooms() {

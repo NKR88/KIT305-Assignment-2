@@ -23,9 +23,8 @@ const val HOUSE_ID:String = "HOUSE_ID"
 const val ROOM_ID:String = "ROOM_ID" // i think i delcare it here incase i need it up here???
 const val SPACE_ID:String = "SPACE_ID"
 
-class MainActivity : AppCompatActivity()
-{
-    private lateinit var ui : ActivityMainBinding
+class MainActivity : AppCompatActivity() {
+    private lateinit var ui: ActivityMainBinding
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +48,7 @@ class MainActivity : AppCompatActivity()
                     R.id.menu_quote -> {
 
                     }
+
                     R.id.menu_add -> {
                         val i = Intent(this, HouseAdd::class.java)
                         startActivity(i)
@@ -69,10 +69,17 @@ class MainActivity : AppCompatActivity()
 
     inner class MovieHolder(var ui: MyListItemBinding) : RecyclerView.ViewHolder(ui.root) {}
 
-    inner class MovieAdapter(private val houses: MutableList<House>) : RecyclerView.Adapter<MovieHolder>()
-    {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainActivity.MovieHolder {
-            val ui = MyListItemBinding.inflate(layoutInflater, parent, false)   //inflate a new row from the my_list_item.xml
+    inner class MovieAdapter(private val houses: MutableList<House>) :
+        RecyclerView.Adapter<MovieHolder>() {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): MainActivity.MovieHolder {
+            val ui = MyListItemBinding.inflate(
+                layoutInflater,
+                parent,
+                false
+            )   //inflate a new row from the my_list_item.xml
             return MovieHolder(ui)                                                            //wrap it in a ViewHolder
         }
 
@@ -112,8 +119,7 @@ class MainActivity : AppCompatActivity()
                     startActivity(i)
                     true
                 }
-            }
-            else {
+            } else {
                 throw NullPointerException("house.id is null") // i feel like a real dev :')
             }
         }
@@ -129,26 +135,34 @@ class MainActivity : AppCompatActivity()
             .collection("rooms")
             .get()
             .addOnSuccessListener { rooms ->
-
-                val batch = db.batch()
+                var remaining = rooms.size()
 
                 for (room in rooms.documents) {
-                    batch.delete(room.reference)
-                }
+                    room.reference
+                        .collection("spaces")
+                        .get()
+                        .addOnSuccessListener { spaces ->
 
-                batch.commit()
-                    .addOnSuccessListener {
-                        db.collection("houses")
-                            .document(house.id)
-                            .delete()
-                            .addOnSuccessListener {
-                                Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
-                                loadHouses()
+                            val batch = db.batch()
+
+                            for (space in spaces.documents) {
+                                batch.delete(space.reference)
                             }
-                            .addOnFailureListener {
-                                Log.e(FIREBASE_TAG, "Error deleting House ID ${house.id}")
-                            }
-                    }
+
+                            batch.delete(room.reference)
+
+                            batch.commit()
+                                .addOnSuccessListener {
+                                    db.collection("houses")
+                                        .document(house.id)
+                                        .delete()
+                                        .addOnSuccessListener {
+                                            Log.d(FIREBASE_TAG, "House ID ${house.id} deleted")
+                                            loadHouses()
+                                        }
+                                }
+                        }
+                }
             }
     }
     private fun loadHouses() {
