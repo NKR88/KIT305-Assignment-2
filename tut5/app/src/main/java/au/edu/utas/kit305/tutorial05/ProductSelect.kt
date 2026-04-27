@@ -5,10 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.kit305.tutorial05.databinding.ProductItemBinding
 import au.edu.utas.kit305.tutorial05.databinding.ProductMainBinding
+import com.bumptech.glide.Glide
+
 
 val p_items = mutableListOf<Product>()
 
@@ -22,64 +25,17 @@ class  ProductSelect : AppCompatActivity() {
         ui.myList.layoutManager = LinearLayoutManager(this)
 
         ui.myList.adapter = ProductAdapter(p_items)
-
+        // obviously all AI but i made sure to try to understand it
         Thread {
-            try {
-                val url = java.net.URL("https://utasbot.dev/kit305_2026/product")
-                val connection = url.openConnection() as java.net.HttpURLConnection
+            val products = ProductApi.fetchProducts()
 
-                connection.requestMethod = "GET"
-                connection.connect()
-
-                val response = connection.inputStream.bufferedReader().readText()
-                Log.d("API", response)
-
-                val jsonObject = org.json.JSONObject(response)
-                val jsonArray = jsonObject.getJSONArray("data")
-
-                val products = mutableListOf<Product>()
-
-                for (i in 0 until jsonArray.length()) {
-                    val obj = jsonArray.getJSONObject(i)
-
-                    val variantsArray = obj.getJSONArray("variants")
-                    val variants = mutableListOf<String>()
-                    for (j in 0 until variantsArray.length()) {
-                        variants.add(variantsArray.getString(j))
-                    }
-
-                    fun optInt(key: String): Int? {
-                        return if (obj.isNull(key)) null else obj.getInt(key)
-                    }
-
-                    val product = Product(
-                        id = obj.getString("id"),
-                        name = obj.getString("name"),
-                        description = obj.getString("description"),
-                        price_per_sqm = obj.getInt("price_per_sqm"),
-                        min_width = optInt("min_width"),
-                        max_width = optInt("max_width"),
-                        max_panels = optInt("max_panels"),
-                        min_height = optInt("min_height"),
-                        max_height = optInt("max_height"),
-                        imageUrl = obj.getString("imageUrl"),
-                        category = obj.getString("category"),
-                        variants = variants
-                    )
-
-                    products.add(product)
-                }
-
-                runOnUiThread {
-                    p_items.clear()
-                    p_items.addAll(products)
-                    ui.myList.adapter?.notifyDataSetChanged()
-                }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
+            runOnUiThread {
+                p_items.clear()
+                p_items.addAll(products)
+                ui.myList.adapter?.notifyDataSetChanged()
             }
         }.start()
+
     }
     inner class ProductHolder(var ui: ProductItemBinding) : RecyclerView.ViewHolder(ui.root) {}
 
@@ -97,6 +53,24 @@ class  ProductSelect : AppCompatActivity() {
         override fun onBindViewHolder(holder: ProductSelect.ProductHolder, position: Int) {
             val product = products[position]   //get the data at the requested position
             holder.ui.txtName.text = product.name
+            holder.ui.txtDesc.text = product.description
+            holder.ui.txtPrice.text = "$${product.price_per_sqm} per sqr metre"
+
+            Glide.with(holder.ui.root.context)
+                .load(product.imageUrl)
+                .centerCrop()
+                .into(holder.ui.imageView)
+
+            // ai used made sure to ask it questions so i understand what is happenig
+            val items = product.variants
+            val spinnerAdapter = ArrayAdapter(
+                holder.ui.root.context,
+                android.R.layout.simple_spinner_item,
+                items
+            ).also {
+                it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+            holder.ui.spinnerColor.adapter = spinnerAdapter
 
 
             holder.ui.root.setOnClickListener {
