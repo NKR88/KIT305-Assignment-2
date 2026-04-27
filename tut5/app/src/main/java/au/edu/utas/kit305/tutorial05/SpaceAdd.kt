@@ -18,14 +18,18 @@ class  SpaceAdd : AppCompatActivity() {
         ui = SpaceAddBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        val spaceID = intent.getIntExtra(SPACE_INDEX, -1)
+        ui.btnSpaceAdd.setText("Continue")
+        ui.btnSpaceCancel.visibility = View.GONE
+
+
+        val spaceIndex = intent.getIntExtra(SPACE_INDEX, -1)
         val houseId = intent.getStringExtra(HOUSE_ID)!! // null checking already handled
         val roomId = intent.getStringExtra(ROOM_ID)!! // null checking already handled
 
-        Log.d("Intent", "Intent ${spaceID}")
+        Log.d("Intent", "Intent ${spaceIndex}")
 
-        if (spaceID != -1) {
-            val spaceObject = s_items[spaceID]
+        if (spaceIndex != -1) {
+            val spaceObject = s_items[spaceIndex]
             Log.d("DEBUG", spaceObject.s_width.toString())
             ui.spaceEditName.setText(spaceObject.s_name)
             ui.spaceEditWidth.setText(spaceObject.s_width.toString())
@@ -44,7 +48,6 @@ class  SpaceAdd : AppCompatActivity() {
 
             Log.d("DEBUG", spaceObject.s_width.toString())
 
-            ui.btnSpaceAdd.setText("Edit")
             ui.btnSpaceAdd.setOnClickListener { view ->
                 val db = Firebase.firestore
                 Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
@@ -69,6 +72,15 @@ class  SpaceAdd : AppCompatActivity() {
                     )
                     .addOnSuccessListener {
                         Log.d(FIREBASE_TAG, "Space ID ${spaceObject.id} updated")
+                        // once suceful take all to new activity
+                        val i = Intent(this, ProductSelect::class.java)
+                        i.putExtra("WIDTH", newSpace.s_width)
+                        i.putExtra("HEIGHT", newSpace.s_height)
+                        i.putExtra("TYPE", newSpace.s_type)
+                        i.putExtra(HOUSE_ID, houseId)
+                        i.putExtra(ROOM_ID, roomId)
+                        i.putExtra(SPACE_ID, spaceObject.id)
+                        startActivity(i)
                         finish()
                     }
                     .addOnFailureListener {
@@ -118,17 +130,17 @@ class  SpaceAdd : AppCompatActivity() {
                         s_type = ui.spaceEditType.selectedItem.toString()
                     )
 
-//                    val spacesCollection =
-//                        db.collection("houses")
-//                            .document(houseId)
-//                            .collection("rooms")
-//                            .document(roomId)
-//                            .collection("spaces")
-//                    spacesCollection
-//                        .add(newSpace)
-//                        .addOnSuccessListener {
-//                            Log.d(FIREBASE_TAG, "Space created with id ${it.id}")
-//                            newSpace.id = it.id
+                    val spacesCollection =
+                        db.collection("houses")
+                            .document(houseId)
+                            .collection("rooms")
+                            .document(roomId)
+                            .collection("spaces")
+                    spacesCollection
+                        .add(newSpace)
+                        .addOnSuccessListener {
+                            Log.d(FIREBASE_TAG, "Space created with id ${it.id}")
+                            newSpace.id = it.id
 
                             // once suceful take all to new activity
                             val i = Intent(this, ProductSelect::class.java)
@@ -139,15 +151,14 @@ class  SpaceAdd : AppCompatActivity() {
                             i.putExtra(ROOM_ID, roomId)
                             i.putExtra(SPACE_ID, newSpace.id)
                             startActivity(i)
-                            true
-//                        }
-//                        .addOnFailureListener {
-//                            Log.e(FIREBASE_TAG, "Error writing Space", it)
-//                        }
+                            finish()
+                        }
+                        .addOnFailureListener {
+                            Log.e(FIREBASE_TAG, "Error writing Space", it)
+                        }
                 }
             }
         }
-        ui.btnSpaceCancel.visibility = View.GONE
     }
     override fun onResume() {
         super.onResume()

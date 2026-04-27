@@ -1,6 +1,5 @@
 package au.edu.utas.kit305.tutorial05
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +12,7 @@ import au.edu.utas.kit305.tutorial05.databinding.ProductMainBinding
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.math.ceil
 
 
 val p_items = mutableListOf<Product>()
@@ -23,6 +23,7 @@ class  ProductSelect : AppCompatActivity() {
     private lateinit var spaceId: String
     private lateinit var houseId: String
     private lateinit var roomId: String
+    private var sqrM = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +38,14 @@ class  ProductSelect : AppCompatActivity() {
         val spaceHeight = intent.getIntExtra("HEIGHT", 0)
         val spaceType = intent.getStringExtra("TYPE")
 
+        sqrM = ceil((spaceWidth/1000.0) * (spaceHeight/1000.0)).toInt()
+
         ui.myList.layoutManager = LinearLayoutManager(this)
 
         ui.myList.adapter = ProductAdapter(p_items)
         // obviously all AI but i made sure to try to understand it
         Thread {
-            Log.d("DEBUG", "This is space tpye -> ${spaceType}")
+            Log.d("DEBUG", "This is space type -> ${spaceType}")
             val products = ProductApi.fetchProducts(spaceType!!)
             var filtered = products
 
@@ -117,25 +120,30 @@ class  ProductSelect : AppCompatActivity() {
 
             holder.ui.root.setOnClickListener {
 
-//                val db = Firebase.firestore
-//                Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
-//
-//                db.collection("houses")
-//                    .document(houseId)
-//                    .collection("rooms")
-//                    .document(roomId)
-//                    .collection("spaces")
-//                    .document(spaceId)
-//                    .update(
-//                        "s_product", product,
-//                    )
-//                    .addOnSuccessListener {
-//                        Log.d(FIREBASE_TAG, "Space has ${product.id} id")
-                        finishAffinity()
-//                    }
-//                    .addOnFailureListener {
-//                        Log.e(FIREBASE_TAG, "Error updating Space ID", it)
-//                    }
+                val db = Firebase.firestore
+                Log.d("FIREBASE", "Firebase connected: ${db.app.name}")
+
+                val price = product.price_per_sqm * sqrM
+
+                db.collection("houses")
+                    .document(houseId)
+                    .collection("rooms")
+                    .document(roomId)
+                    .collection("spaces")
+                    .document(spaceId)
+                    .update(
+                        "s_product", product.id,
+                        "s_variant", holder.ui.spinnerColor.selectedItem.toString(),
+                        "s_price", price,
+                        "s_product_n", product.name
+                    )
+                    .addOnSuccessListener {
+                        Log.d(FIREBASE_TAG, "Space Prod has ${product.id} id")
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Log.e(FIREBASE_TAG, "Error updating Space Prod ID", it)
+                    }
             }
         }
     }

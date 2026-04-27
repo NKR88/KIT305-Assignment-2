@@ -87,7 +87,7 @@ class MainActivity3 : AppCompatActivity()
         override fun onBindViewHolder(holder: MainActivity3.SpaceHolder, position: Int) {
             val space = spaces[position]   //get the data at the requested position
             holder.ui.txtName.text = space.s_name
-            holder.ui.txtType.text = space.s_type
+            holder.ui.txtType.text = "${space.s_product_n} | ${space.s_variant}"
             holder.ui.txtWH.text = "${space.s_width}mm x ${space.s_height}mm"
 
             if (space.id != null) {
@@ -104,17 +104,17 @@ class MainActivity3 : AppCompatActivity()
                         .show()
                 }
 
-                holder.ui.root.setOnClickListener {
-                    val i = Intent(holder.ui.root.context, MainActivity3::class.java)
-                    i.putExtra(HOUSE_ID, houseId)
-                    i.putExtra(ROOM_ID, roomId)
-                    i.putExtra(SPACE_ID, space.id)!!
-                    startActivity(i)
-                    true
-                }
+//                holder.ui.root.setOnClickListener {
+//                    val i = Intent(holder.ui.root.context, MainActivity3::class.java)
+//                    i.putExtra(HOUSE_ID, houseId)
+//                    i.putExtra(ROOM_ID, roomId)
+//                    i.putExtra(SPACE_ID, space.id)!!
+//                    startActivity(i)
+//                    true
+//                }
 
                 //holder.ui.root.setO
-                holder.ui.root.setOnLongClickListener {
+                holder.ui.root.setOnClickListener {
                     val i = Intent(holder.ui.root.context, SpaceAdd::class.java)
                     i.putExtra(SPACE_INDEX, position)
                     i.putExtra(HOUSE_ID, houseId)
