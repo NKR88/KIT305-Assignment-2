@@ -1,29 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    tools:context=".QuoteActivity"
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/lblTotal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
         android:text="Total: $0"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:paddingBottom="12dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#DDDDDD"
-        android:layout_marginBottom="8dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/lblTotal"
+        tools:layout_editor_absoluteX="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quoteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toTopOf="@+id/btnShare"
+        app:layout_constraintTop_toBottomOf="@+id/lblTotal"
+        tools:layout_editor_absoluteX="12dp">
 
-</LinearLayout>
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <Button
+        android:id="@+id/btnShare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="Share"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnCancel"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnShare"
+        app:layout_constraintTop_toTopOf="@+id/btnShare" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

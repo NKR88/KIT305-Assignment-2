@@ -3,4 +3,5 @@
     <string name="house_add_owner"><u>Owner</u></string>
     <string name="house_add_address"><u>Address</u></string>
     <string name="enter_hint">Enter here...</string>
+    <string name="search_hint">Search...</string>
 </resources>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.kit305.tutorial05.databinding.ActivityMainBinding
@@ -31,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
+
+        //get all houses
+        //loadHouses()
 
         ui.lblMovieCount.text = "${h_items.size} Houses"
         ui.myList.adapter = MovieAdapter(houses = h_items)
@@ -59,8 +63,15 @@ class MainActivity : AppCompatActivity() {
             }
             popup.show()
         }
-        //get all movies
-        loadHouses()
+
+        // ai used to find the tool correct tool i wrote the rest
+        ui.txtSearch.addTextChangedListener { text ->
+            val filtered = h_items.filter {
+                it.h_address.contains(text.toString(), ignoreCase = true) ||
+                it.h_owner.contains(text.toString(), ignoreCase = true)
+            }
+            (ui.myList.adapter as? MovieAdapter)?.updateList(filtered)
+        }
     }
 
     override fun onResume() {
@@ -84,12 +95,19 @@ class MainActivity : AppCompatActivity() {
             return MovieHolder(ui)                                                            //wrap it in a ViewHolder
         }
 
+        private var displayedHouses = houses.toMutableList()
+        fun updateList(filtered: List<House>) {
+            displayedHouses.clear()
+            displayedHouses.addAll(filtered)
+            notifyDataSetChanged()
+        }
+
         override fun getItemCount(): Int {
-            return houses.size
+            return displayedHouses.size
         }
 
         override fun onBindViewHolder(holder: MainActivity.MovieHolder, position: Int) {
-            val house = houses[position]   //get the data at the requested position
+            val house = displayedHouses[position]   //get the data at the requested position
             holder.ui.txtName.text = house.h_address
             holder.ui.txtYear.text = house.h_owner
 
@@ -195,6 +213,7 @@ class MainActivity : AppCompatActivity() {
                     h_items.add(house)
                 }
                 (ui.myList.adapter as? MovieAdapter)?.notifyDataSetChanged()
+                (ui.myList.adapter as? MovieAdapter)?.updateList(h_items)  // add this
                 ui.lblMovieCount.text = " ${h_items.size} Houses"
             }
             .addOnFailureListener {

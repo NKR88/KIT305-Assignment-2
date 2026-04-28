@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.edu.utas.kit305.tutorial05.MainActivity.MovieAdapter
 import au.edu.utas.kit305.tutorial05.databinding.ActivityMain2Binding
 import au.edu.utas.kit305.tutorial05.databinding.RoomItemBinding
 import com.google.firebase.firestore.ktx.firestore
@@ -59,8 +61,15 @@ class MainActivity2 : AppCompatActivity()
             }
             popup.show()
         }
+
+        ui.txtSearch.addTextChangedListener { text ->
+            val filtered = r_items.filter {
+                it.r_name.contains(text.toString(), ignoreCase = true)
+            }
+            (ui.myList.adapter as? RoomAdapter)?.updateList(filtered)
+        }
         //get all Rooms
-        loadRooms()
+        //loadRooms()
     }
 
     override fun onResume() {
@@ -77,12 +86,18 @@ class MainActivity2 : AppCompatActivity()
             return RoomHolder(ui)                                                            //wrap it in a ViewHolder
         }
 
+        private var displayedRooms = rooms.toMutableList()
+        fun updateList(filtered: List<Room>) {
+            displayedRooms.clear()
+            displayedRooms.addAll(filtered)
+            notifyDataSetChanged()
+        }
         override fun getItemCount(): Int {
-            return rooms.size
+            return displayedRooms.size
         }
 
         override fun onBindViewHolder(holder: MainActivity2.RoomHolder, position: Int) {
-            val room = rooms[position]   //get the data at the requested position
+            val room = displayedRooms[position]   //get the data at the requested position
             holder.ui.txtName.text = room.r_name
 
             if (room.id != null) {
@@ -175,6 +190,7 @@ class MainActivity2 : AppCompatActivity()
                     r_items.add(room)
                 }
                 (ui.myList.adapter as? RoomAdapter)?.notifyDataSetChanged()
+                (ui.myList.adapter as? RoomAdapter)?.updateList(r_items)  // add this
                 ui.lblRoomCount.text = " ${r_items.size} Rooms"
             }
             .addOnFailureListener {

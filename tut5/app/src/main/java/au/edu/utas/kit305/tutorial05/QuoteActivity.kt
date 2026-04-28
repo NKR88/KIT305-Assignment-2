@@ -1,9 +1,10 @@
 // the majority of this page was done with the assistance of AI to make the bulk of the boiler plate
 // i gave it my previous work which was majority my own work so it uses tool i have used throughout
 // this project, I made sure to read through it all and undertand it and make the changes to get it
-// working properly. The checkbox logic for example
+// working properly. The checkbox logic for example.
 package au.edu.utas.kit305.tutorial05
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
@@ -39,6 +40,49 @@ class QuoteActivity : AppCompatActivity() {
 
         ui.lblTotal.text = "Total: $0"
         loadAllData()
+
+        ui.btnCancel.setOnClickListener {
+            finish()
+        }
+        ui.btnShare.setOnClickListener {
+            shareQuoteAsCSV()
+        }
+    }
+
+    private fun shareQuoteAsCSV() {
+        val sb = StringBuilder()
+        // header row
+        sb.appendLine("House,Room,Space,Type,Product,Variant,Width,Height,Price")
+        for (house in houseList) {
+            for (room in house.rooms) {
+                if (room.included) {
+                    // add a row for the room flat cost
+                    sb.appendLine("${house.house.h_address},${room.room.r_name},NULL,Room,NULL,NULL,NULL,NULL,${ROOM_FLAT_COST}")
+                    for (space in room.spaces) {
+                        if (space.included) {
+                            sb.appendLine(
+                                "${house.house.h_address}," +
+                                        "${room.room.r_name}," +
+                                        "${space.space.s_name}," +
+                                        "${space.space.s_type}," +
+                                        "${space.space.s_product_n}," +
+                                        "${space.space.s_variant}," +
+                                        "${space.space.s_width}," +
+                                        "${space.space.s_height}," +
+                                        "${space.space.s_price}"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        Log.d("DEBUG", sb.toString())
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/csv"
+            putExtra(Intent.EXTRA_SUBJECT, "Itemised Quote Summary")
+            putExtra(Intent.EXTRA_TEXT, sb.toString())
+        }
+        startActivity(Intent.createChooser(intent, "Share Quote"))
     }
 
     private fun recalculateTotal() {
