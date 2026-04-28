@@ -1,6 +1,7 @@
 // the majority of this page was done with the assistance of AI to make the bulk of the boiler plate
 // i gave it my previous work which was majority my own work so it uses tool i have used throughout
-// this project
+// this project, I made sure to read through it all and undertand it and make the changes to get it
+// working properly. The checkbox logic for example
 package au.edu.utas.kit305.tutorial05
 
 import android.os.Bundle
@@ -59,7 +60,8 @@ class QuoteActivity : AppCompatActivity() {
 
     private fun loadAllData() {
         ui.lblTotal.text = "Loading..."
-        db.collection("houses").get()
+        db.collection("houses")
+            .get()
             .addOnSuccessListener { houseDocs ->
                 houseList.clear()
                 var housesRemaining = houseDocs.size()
@@ -150,9 +152,9 @@ class QuoteAdapter(
         holder.ui.txtHouseAddress.text = houseData.house.h_address
         holder.ui.roomContainer.removeAllViews()
 
+        // ai used for the design of the boxes
         for (roomData in houseData.rooms) {
             val context = holder.ui.root.context
-            val inflater = android.view.LayoutInflater.from(context)
 
             val roomRow = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
@@ -165,22 +167,32 @@ class QuoteAdapter(
                 textSize = 15f
             }
 
+            val spaceCheckboxes = mutableListOf<CheckBox>()
+
+            var noCascade = false
+
             roomCheck.setOnCheckedChangeListener { _, isChecked ->
+                if (noCascade) return@setOnCheckedChangeListener
+
                 roomData.included = isChecked
-                // cascade to all spaces under this room
-                for (spaceData in roomData.spaces) {
+
+                // cascade to all spaces
+                for ((index, spaceData) in roomData.spaces.withIndex()) {
                     spaceData.included = isChecked
+                    spaceCheckboxes[index].isChecked = isChecked
                 }
-                // refresh this item so space checkboxes update
-                notifyItemChanged(position)
                 onChanged()
+
             }
 
             roomRow.addView(roomCheck)
 
             for (spaceData in roomData.spaces) {
+                val currentRoom = roomData
                 val spaceCheck = CheckBox(context).apply {
-                    text = "  ${spaceData.space.s_name} — ${spaceData.space.s_type}  (+$${spaceData.space.s_price})"
+                    text = "  ${spaceData.space.s_name} — ${spaceData.space.s_type}  (+$${spaceData.space.s_price})\n" +
+                            "       ${spaceData.space.s_product_n} | ${spaceData.space.s_variant}\n" +
+                            "       ${spaceData.space.s_width}mm x ${spaceData.space.s_height}mm"
                     isChecked = spaceData.included
                     textSize = 13f
                     setPadding(64, 0, 0, 0)
@@ -188,13 +200,20 @@ class QuoteAdapter(
 
                 spaceCheck.setOnCheckedChangeListener { _, isChecked ->
                     spaceData.included = isChecked
-
-                    // if a space is unchecked, uncheck the parent room too
-                    if (!isChecked) roomData.included = false
+                    // room checked if ANY space is checked
+                    val anyChecked = currentRoom.spaces.any { it.included }
+                    currentRoom.included = anyChecked
+                    // update room checkbox directly — no notifyItemChanged
+                    noCascade = true
+                    roomCheck.isChecked = anyChecked
+                    noCascade = false
                     onChanged()
                 }
+
+                spaceCheckboxes.add(spaceCheck)
                 roomRow.addView(spaceCheck)
             }
+
             holder.ui.roomContainer.addView(roomRow)
         }
     }
