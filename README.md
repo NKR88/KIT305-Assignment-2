@@ -69,3 +69,4 @@ Each of these has a corresponding "Add" Activity used to create and edit entries
 
 - AI-assisted sections are clearly commented in the code
 - All implemented features were reviewed and understood before submission
+- This README was made with AI also incase you couldnt tell lol, last time i did it manually never again
