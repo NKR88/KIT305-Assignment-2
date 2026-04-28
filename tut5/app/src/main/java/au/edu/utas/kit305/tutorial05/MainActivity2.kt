@@ -92,6 +92,7 @@ class MainActivity2 : AppCompatActivity()
             displayedRooms.addAll(filtered)
             notifyDataSetChanged()
         }
+
         override fun getItemCount(): Int {
             return displayedRooms.size
         }
@@ -190,7 +191,7 @@ class MainActivity2 : AppCompatActivity()
                     r_items.add(room)
                 }
                 (ui.myList.adapter as? RoomAdapter)?.notifyDataSetChanged()
-                (ui.myList.adapter as? RoomAdapter)?.updateList(r_items)  // add this
+                (ui.myList.adapter as? RoomAdapter)?.updateList(r_items)
                 ui.lblRoomCount.text = " ${r_items.size} Rooms"
             }
             .addOnFailureListener {

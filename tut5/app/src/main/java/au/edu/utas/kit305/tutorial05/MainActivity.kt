@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity() {
                     h_items.add(house)
                 }
                 (ui.myList.adapter as? MovieAdapter)?.notifyDataSetChanged()
-                (ui.myList.adapter as? MovieAdapter)?.updateList(h_items)  // add this
+                (ui.myList.adapter as? MovieAdapter)?.updateList(h_items)
                 ui.lblMovieCount.text = " ${h_items.size} Houses"
             }
             .addOnFailureListener {

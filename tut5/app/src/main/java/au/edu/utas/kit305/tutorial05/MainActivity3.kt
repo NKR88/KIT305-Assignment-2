@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.edu.utas.kit305.tutorial05.MainActivity2.RoomAdapter
 import au.edu.utas.kit305.tutorial05.databinding.ActivityMain3Binding
 import au.edu.utas.kit305.tutorial05.databinding.SpaceItemBinding
 import com.google.firebase.firestore.ktx.firestore
@@ -63,8 +65,15 @@ class MainActivity3 : AppCompatActivity()
             }
             popup.show()
         }
+        ui.txtSearch.addTextChangedListener { text ->
+            val filtered = s_items.filter {
+                it.s_name.contains(text.toString(), ignoreCase = true) ||
+                it.s_type.contains(text.toString(), ignoreCase = true)
+            }
+            (ui.myList.adapter as? SpaceAdapter)?.updateList(filtered)
+        }
         //get all Spaces
-        loadSpaces()
+        //loadSpaces()
     }
 
     override fun onResume() {
@@ -81,12 +90,19 @@ class MainActivity3 : AppCompatActivity()
             return SpaceHolder(ui)                                                            //wrap it in a ViewHolder
         }
 
+        private var displayedSpaces = spaces.toMutableList()
+        fun updateList(filtered: List<Space>) {
+            displayedSpaces.clear()
+            displayedSpaces.addAll(filtered)
+            notifyDataSetChanged()
+        }
+
         override fun getItemCount(): Int {
-            return spaces.size
+            return displayedSpaces.size
         }
 
         override fun onBindViewHolder(holder: MainActivity3.SpaceHolder, position: Int) {
-            val space = spaces[position]   //get the data at the requested position
+            val space = displayedSpaces[position]   //get the data at the requested position
             holder.ui.txtName.text = space.s_name
             holder.ui.txtType.text = "${space.s_product_n} | ${space.s_variant}"
             holder.ui.txtWH.text = "${space.s_width}mm x ${space.s_height}mm"
@@ -175,6 +191,7 @@ class MainActivity3 : AppCompatActivity()
                     s_items.add(space)
                 }
                 (ui.myList.adapter as? SpaceAdapter)?.notifyDataSetChanged()
+                (ui.myList.adapter as? SpaceAdapter)?.updateList(s_items)
                 ui.lblSpaceCount.text = " ${s_items.size} Spaces"
             }
             .addOnFailureListener {

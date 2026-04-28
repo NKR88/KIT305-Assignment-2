@@ -33,9 +33,11 @@
         android:id="@+id/txtSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=""
         android:hint="Search..."
-        android:textSize="30sp"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/lblMovieCount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/lblMovieCount"
         app:layout_constraintTop_toTopOf="@+id/lblMovieCount" />

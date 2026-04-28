@@ -33,7 +33,8 @@
         android:layout_height="wrap_content"
         android:hint="Search..."
         android:text=""
-        android:textSize="30sp"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/lblRoomCount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/lblRoomCount"
         app:layout_constraintTop_toTopOf="@+id/lblRoomCount" />
